@@ -1,24 +1,53 @@
-# Compiled class file
+# ===== Build artifacts / deps =====
+target/
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+.mvn/wrapper/maven-wrapper.jar
+.gradle/
+build/
+out/
+dist/
+desktop/node_modules/
+desktop/dist/
+desktop/src-tauri/target/
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# ===== IDE / OS =====
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ===== Env / Secrets (never commit real values) =====
+.env
+.env.local
+.env.*.local
+.env.*.secret
+!.env.example
+*.p12
+*.jks
+*.pem
+*.key
+id_rsa
+application-prod.yml
+application-prod.properties
+*.credential*
+*secret*
+application.properties.bak
+*.bak
+
+# ===== Runtime logs / media =====
+logs/
+*.log
+TTS/
+screenshots/
+
+# ===== Local secrets / data to exclude =====
+wechat-login/
+log.md
+发票test.pdf
+
+# ===== Stray compiled artifact at repo root =====
+com/github/
