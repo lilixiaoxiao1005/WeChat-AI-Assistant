@@ -52,3 +52,7 @@ log.md
 
 # ===== Stray compiled artifact at repo root =====
 com/github/
+
+# ===== Workspace tooling / agent memory (never commit) =====
+.workbuddy/
+/package-lock.json
