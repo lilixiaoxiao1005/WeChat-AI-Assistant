@@ -9,6 +9,7 @@ out/
 dist/
 desktop/node_modules/
 desktop/dist/
+desktop/.vite/
 desktop/src-tauri/target/
 
 # ===== IDE / OS =====
