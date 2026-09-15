@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend:
+    name: Build backend (Maven)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven (skip tests)
+        run: ./mvnw -B package -DskipTests
+
+  frontend:
+    name: Build frontend (npm)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: desktop/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build frontend
+        run: npm run build
+        env:
+          VITE_AMAP_KEY: ${{ secrets.VITE_AMAP_KEY }}
+
+  # Tauri desktop build is intentionally omitted from this skeleton:
+  # it requires Rust + native system dependencies + code signing secrets.
+  # Enable it in your fork by adding a `tauri-build` job that installs Rust,
+  # the platform build tools, and the signing secrets referenced below.
+  # Secrets referenced (never committed): VITE_AMAP_KEY, MYSQL_PASSWORD,
+  # WECHAT_APPSECRET, LLM_API_KEY, MCP_CLIENT_SECRET, etc.
