@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  异步日志配置（零行为改动）：
+  - 复用 Spring Boot 自带的 CONSOLE appender；
+  - 新增滚动文件 FILE appender（按天滚动，保留 7 天）；
+  - 用 AsyncAppender 包裹 FILE，把磁盘 IO 从业务线程异步化，
+    避免高并发日志刷盘阻塞主线程（不影响任何业务逻辑）。
+  - logging.level.* 等配置仍由 Spring Boot 在加载本文件后照常生效。
+-->
+<configuration scan="true" scanPeriod="60 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <property name="LOG_FILE" value="${LOG_FILE:-./logs/wechat-ai-assistant}"/>
+
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 异步包裹文件输出：队列 2048，关闭丢弃阈值以保证不丢日志（代价是队列满时轻微阻塞） -->
+    <appender name="ASYNC_FILE" class="ch.qos.logback.core.async.AsyncAppender">
+        <appender-ref ref="FILE"/>
+        <queueSize>2048</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_FILE"/>
+    </root>
+</configuration>
