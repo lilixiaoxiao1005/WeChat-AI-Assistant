@@ -37,10 +37,29 @@ jobs:
           cache-dependency-path: desktop/package-lock.json
       - name: Install dependencies
         run: npm ci
+      # 依赖漏洞扫描：仅报告、不阻断构建（continue-on-error），
+      # 出现高危/中危漏洞时在 PR 检查中可见，但不影响 npm run build 与产物。
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=high
+        continue-on-error: true
       - name: Build frontend
         run: npm run build
         env:
           VITE_AMAP_KEY: ${{ secrets.VITE_AMAP_KEY }}
+
+  # 依赖漏洞审查：仅在 PR 时运行，比对 base 分支的依赖变更，
+  # 若引入 high 及以上严重度的漏洞则令 PR 检查失败（安全门禁）。
+  # 不影响 main 分支的推送构建，也不改动任何业务代码。
+  dependency-review:
+    name: Dependency review (Maven + npm)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
 
   # Tauri desktop build is intentionally omitted from this skeleton:
   # it requires Rust + native system dependencies + code signing secrets.
