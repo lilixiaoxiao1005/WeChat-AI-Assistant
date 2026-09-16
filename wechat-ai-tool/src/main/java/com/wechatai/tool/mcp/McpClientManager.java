@@ -3,6 +3,7 @@ package com.wechatai.tool.mcp;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -114,7 +115,14 @@ public class McpClientManager {
         return source.executeTool(toolName, argsJson);
     }
 
-    /** 获取指定 MCP 源的工具定义列表 */
+    /**
+     * 获取指定 MCP 源的工具定义列表。
+     * <p>
+     * 结果用 Caffeine 缓存（spring.cache.caffeine.spec 配置的 TTL/容量）：
+     * MCP 工具定义属于配置型数据、变化极少，缓存可避免每次都发起网络请求，
+     * 且不影响任何写/执行路径（真正执行走 {@link #executeTool}）。
+     */
+    @Cacheable("mcpTools")
     public List<McpToolDefinition> getToolsFromSource(String sourceName) {
         McpSource source = sourceIndex.get(sourceName);
         if (source == null) return List.of();

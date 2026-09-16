@@ -2,6 +2,7 @@ package com.wechatai;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 ////////////////////////////////////////////////////////////////////
@@ -35,6 +36,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication(scanBasePackages = "com.wechatai")
 @EnableScheduling
+@EnableCaching
 public class WechatAiApplication {
 
     public static void main(String[] args) {
